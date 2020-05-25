@@ -1,22 +1,9 @@
-from typing import List, Any, Callable, Optional
-#import dataclasses
+from typing import List, Optional
 import dateutil.parser as du
 import datetime as dt
 
 from pydantic.dataclasses import dataclass
 from pydantic import constr, condecimal
-
-
-# can throw ValueError due to date parsing
-def mapping(key: int) -> Callable[[List[str]], Any]:
-    to_fn = {
-        Header.record_type(): Header.from_row,
-        Footer.record_type(): Footer.from_row,
-        Summary.record_type(): Summary.from_row,
-        NuosCharge.record_type(): NuosCharge.from_row,
-        EventCharge.record_type(): EventCharge.from_row,
-    }
-    return to_fn[key]
 
 
 @dataclass(frozen=True)
