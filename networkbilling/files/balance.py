@@ -5,6 +5,12 @@ import datetime as dt
 from pydantic.dataclasses import dataclass
 from pydantic import constr, condecimal
 
+import io
+import csv
+import pathlib as pl
+
+import networkbill.files as files
+
 
 @dataclass(frozen=True)
 class Header:
@@ -57,7 +63,7 @@ class Detail:
 
 
 @dataclass(frozen=True)
-class Footer:
+class Footer(files.FooterRow):
     record_count: condecimal(max_digits=10)
     balance: condecimal(max_digits=15, decimal_places=2)
 
@@ -71,3 +77,25 @@ class Footer:
             record_count=row[1],
             balance=row[2],
         )
+
+    def record_count(self) -> int:
+        return self.record_count
+
+
+@dataclass(frozen=True)
+class Balance(files.NetworkFile):
+    # this should index into a dict and throw a key error if record_type
+    # is unexpected
+    @staticmethod
+    def record_mapping(record_type: int) -> Callable[[List[str], files.NetworkRow]]:
+        to_fn = {
+            Header.record_type(): Header.from_row,
+            Detail.record_type(): Detail.from_row,
+            Footer.record_type(): Footer.from_row,
+        }
+        return to_fn[record_type]
+
+
+    @staticmethod
+    def filename() -> str:
+        return "Balance"

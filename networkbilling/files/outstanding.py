@@ -5,6 +5,12 @@ import datetime as dt
 from pydantic.dataclasses import dataclass
 from pydantic import constr, condecimal
 
+import io
+import csv
+import pathlib as pl
+
+import networkbill.files as files
+
 
 @dataclass(frozen=True)
 class Header:
@@ -79,3 +85,5 @@ class Footer:
             record_count=row[1],
             total_amount=row[2],
         )
+
+

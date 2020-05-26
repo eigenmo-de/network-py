@@ -1,9 +1,15 @@
-from typing import List
+from typing import List, Iterable
 import dateutil.parser as du
 import datetime as dt
 
 from pydantic.dataclasses import dataclass
 from pydantic import constr, condecimal
+
+import io
+import csv
+import pathlib as pl
+
+import networkbill.files as files
 
 
 @dataclass(frozen=True)
@@ -69,3 +75,41 @@ class Footer:
         )
 
 
+@dataclass(frozen=True)
+class Remittance:
+    header: Header
+    footer: Footer
+
+    @staticmethod
+    def from_filesystem(path: pl.Path) -> "Remittance":
+        with open(path, 'r') as f:
+            return Remittance(csv.reader(f))
+
+    @staticmethod
+    def from_str(f: str) -> "Remittance":
+        return Remittance(csv.reader(io.StringIO(f)))
+
+    def __init__(self, csv_reader: Iterable[List[str]]) -> None:
+        self._files = dict()
+        rows = len(csv_reader)
+        for row in csv_reader:
+            record_type = row[0]
+            if record_type == Header.record_type():
+                self.header = Header.from_row(row)
+            elif record_type == Footer.record_type():
+                self.footer = Footer.from_row(row)
+            elif record_type == Detail.record_type():
+                self.detail.append(Detail.from_row(row))
+            else: 
+                raise files.UnexpectedRecordType(
+                    "got {got} when parsing remittance file row {row}"
+                    .format(got=record_type, row=row))
+        if self.header is None:
+            raise files.MissingHeader()
+        if self.footer is None:
+            raise files.MissingFooter()
+        if self.footer.record_count != rows:
+            raise files.UnexpectedNumberOfRows(
+                    "got {got} but expected {exp}"
+                    .format(got=rows, exp=self.footer.record_count)
+                    )

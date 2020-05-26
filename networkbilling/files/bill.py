@@ -5,6 +5,8 @@ import datetime as dt
 from pydantic.dataclasses import dataclass
 from pydantic import constr, condecimal
 
+import networkbill.files as files
+
 
 @dataclass(frozen=True)
 class Header:
