@@ -20,7 +20,7 @@ setuptools.setup(
     ],
     install_requires=[
         'python-dateutil',
-	'pydantic',
+        'pydantic',
     ],
     python_requires='>=3.8',
 )
