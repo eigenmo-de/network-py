@@ -1,6 +1,7 @@
 
 import networkbilling.bill as bill
 import networkbilling.dispute as dispute
+import networkbilling.disputestatuschange as disputestatuschange
 import networkbilling.outstanding as outstanding
 import networkbilling.balance as balance
 import networkbilling.remittance as remittance
@@ -34,7 +35,8 @@ def header_mapping(record_type: int) -> Any:
     to_fn = {
         10: bill.Bill,
         800: remittance.Remittance,
-        913: dispute.Dispute,
+        910: dispute.Dispute,
+        913: disputestatuschange.DisputeStatusChange,
         930: outstanding.Outstanding,
         940: balance.Balance,
     }

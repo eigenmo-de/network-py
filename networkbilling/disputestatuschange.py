@@ -22,7 +22,7 @@ class Header(base.HeaderRow):
 
     @staticmethod
     def record_type() -> int:
-        return 930
+        return 913
 
     @staticmethod
     def from_row(row: List[str]) -> "Header":
@@ -40,66 +40,58 @@ class Header(base.HeaderRow):
 @dataclass(frozen=True)
 class Detail(base.NetworkRow):
     unique_number: constr(max_length=20)
+    line_id: constr(max_length=17)
 
     nmi: constr(max_length=10)
     nmi_checksum: constr(min_length=1, max_length=1)
 
-    issue_date: dt.date
-    due_date: dt.date
-
-    total_amount: condecimal(max_digits=15, decimal_places=2)
-
-    dispute_recieved_indicator: constr(max_length=1)
-    comments: Optional[constr(max_length=240)]
+    new_status_code: constr(max_length=4)
+    status_change_comments: Optional[constr(max_length=240)]
 
     @staticmethod
     def record_type() -> int:
-        return 931
+        return 914
 
     @staticmethod
     def from_row(row: List[str]) -> "Detail":
         return Detail(
             unique_number=row[1],
-            nmi=row[2],
-            nmi_checksum=row[3],
-            issue_date=du.parse(row[4]).date(),
-            due_date=du.parse(row[5]).date(),
-            total_amount=row[6],
-            dispute_recieved_indicator=row[7],
-            comments=row[8],
+            line_id=row[2],
+            nmi=row[3],
+            nmi_checksum=row[4],
+            new_status_code=row[5],
+            status_change_comments=row[6]
         )
 
 
 @dataclass(frozen=True)
 class Footer(base.FooterRow):
-    total_amount: condecimal(max_digits=15, decimal_places=2)
     record_count: condecimal(max_digits=10, decimal_places=0)
 
     @staticmethod
     def record_type() -> int:
-        return 932
+        return 915
 
     @staticmethod
     def from_row(row: List[str]) -> "Footer":
         return Footer(
             record_count=row[1],
-            total_amount=row[2],
         )
 
 
-class Outstanding:
+class DisputeStatusChange:
     header: Header
     footer: Footer
     details: List[Detail] = list()
 
     @staticmethod
-    def from_filesystem(path: pl.Path) -> "Outstanding":
+    def from_filesystem(path: pl.Path) -> "DisputeStatusChange":
         with open(path, 'r') as f:
-            return Outstanding(csv.reader(f))
+            return DisputeStatusChange(csv.reader(f))
 
     @staticmethod
-    def from_str(f: str) -> "Outstanding":
-        return Outstanding(csv.reader(io.StringIO(f)))
+    def from_str(f: str) -> "DisputeStatusChange":
+        return DisputeStatusChange(csv.reader(io.StringIO(f)))
 
     def __init__(self, csv_reader: Iterable[List[str]]) -> None:
         rows = sum(1 for r in csv_reader)
@@ -113,7 +105,7 @@ class Outstanding:
                 self.details.append(Detail.from_row(row))
             else: 
                 raise base.UnexpectedRecordType(
-                    "got {got} when parsing Outstanding file row {row}"
+                    "got {got} when parsing dispute file row {row}"
                     .format(got=record_type, row=row))
         if self.header is None:
             raise base.MissingHeader()

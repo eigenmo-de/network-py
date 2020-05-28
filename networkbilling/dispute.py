@@ -1,4 +1,4 @@
-from typing import List, Iterable
+from typing import List, Iterable, Optional
 import dateutil.parser as du
 import datetime as dt
 
@@ -17,8 +17,6 @@ class Header(base.HeaderRow):
     dnsp_code: constr(max_length=10)
     retailer_code: constr(max_length=10)
     timestamp: str
-    start_period: dt.date
-    end_period: dt.date
 
     @staticmethod
     def record_type() -> int:
@@ -45,8 +43,11 @@ class Detail(base.NetworkRow):
     nmi: constr(max_length=10)
     nmi_checksum: constr(min_length=1, max_length=1)
 
-    new_status_code: constr(max_length=4)
-    status_change_comments: constr(max_length=240)
+    disputed_amount: Optional[condecimal(max_digits=15, decimal_places=2)]
+    tax_charge_amount: Optional[condecimal(max_digits=15, decimal_places=2)]
+    tax_charge_indicator: Optional[constr(min_length=1, max_length=1)]
+    dispute_reason_code: constr(max_length=4)
+    dispute_reason_comments: Optional[constr(max_length=240)]
 
     @staticmethod
     def record_type() -> int:

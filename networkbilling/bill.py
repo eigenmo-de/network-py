@@ -127,7 +127,7 @@ class NuosCharge(base.NetworkRow):
     rate: condecimal(max_digits=9, decimal_places=5)
     charge_amount: condecimal(max_digits=15, decimal_places=2)
     tax_charge_amount: condecimal(max_digits=15, decimal_places=2)
-    tax_chage_indicator: constr(min_length=1, max_length=1)
+    tax_charge_indicator: constr(min_length=1, max_length=1)
 
     @staticmethod
     def record_type() -> int:
@@ -156,7 +156,7 @@ class NuosCharge(base.NetworkRow):
             rate=row[18],
             charge_amount=row[19],
             tax_charge_amount=row[20],
-            tax_chage_indicator=row[21],
+            tax_charge_indicator=row[21],
         )
 
 
@@ -182,7 +182,7 @@ class EventCharge(base.NetworkRow):
     rate: condecimal(max_digits=9, decimal_places=5)
     charge_amount: condecimal(max_digits=15, decimal_places=2)
     tax_charge_amount: condecimal(max_digits=15, decimal_places=2)
-    tax_chage_indicator: constr(min_length=1, max_length=1)
+    tax_charge_indicator: constr(min_length=1, max_length=1)
 
     @staticmethod
     def record_type() -> int:
@@ -209,7 +209,7 @@ class EventCharge(base.NetworkRow):
             rate=row[16],
             charge_amount=row[17],
             tax_charge_amount=row[18],
-            tax_chage_indicator=row[19],
+            tax_charge_indicator=row[19],
         )
 
 
@@ -232,7 +232,7 @@ class InterestCharge(base.NetworkRow):
 
     interest_charge_amount: condecimal(max_digits=9, decimal_places=2)
     tax_charge_amount: condecimal(max_digits=9, decimal_places=2)
-    tax_chage_indicator: constr(min_length=1, max_length=1)
+    tax_charge_indicator: constr(min_length=1, max_length=1)
 
     @staticmethod
     def record_type() -> int:
@@ -257,7 +257,7 @@ class InterestCharge(base.NetworkRow):
             interest_period_end_date=du.parse(row[13]).date(),
             interest_charge_amount=row[14],
             tax_charge_amount=row[15],
-            tax_chage_indicator=row[16],
+            tax_charge_indicator=row[16],
         )
 
 
