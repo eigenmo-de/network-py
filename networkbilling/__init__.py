@@ -1,14 +1,41 @@
-from typing import List, Dict, Any, Iterable
-import datetime as dt
-import dateutil.parser as du
-import pathlib as pl
+
+import networkbilling.bill as bill
+import networkbilling.dispute as dispute
+import networkbilling.outstanding as outstanding
+import networkbilling.balance as balance
+import networkbilling.remittance as remittance
+
+from typing import Any, Type
+
+
+# can throw ValueError due to date parsing
+
 import csv
 import io
-
-# we want these to be accessible from the root, eg aemo.TableKey
-#from aemo.key import TableKey, TableRowsMustHaveSameKey
-
-# all tables themselves have unique names but are then re-exported via tables
-import networkbill.files.bill as bill
+import pathlib as pl
 
 
+def from_filesystem(path: pl.Path) -> Type[object]:
+    with open(path, 'r') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+        header_record_type = int(data[0][0])
+        return header_mapping(header_record_type)(data)
+
+
+def from_str(f: str) -> Type[object]:
+    reader = csv.reader(io.StringIO(f))
+    data = list(reader)
+    header_record_type = int(data[0][0])
+    return header_mapping(header_record_type)(data)
+
+
+def header_mapping(record_type: int) -> Any:
+    to_fn = {
+        10: bill.Bill,
+        800: remittance.Remittance,
+        913: dispute.Dispute,
+        930: outstanding.Outstanding,
+        940: balance.Balance,
+    }
+    return to_fn[record_type]

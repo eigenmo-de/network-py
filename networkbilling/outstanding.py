@@ -1,19 +1,19 @@
-from typing import List
+from typing import List, Iterable
 import dateutil.parser as du
 import datetime as dt
 
 from pydantic.dataclasses import dataclass
 from pydantic import constr, condecimal
 
-import io
-import csv
-import pathlib as pl
+import networkbilling.base as base
 
-import networkbill.files as files
+import csv
+import io
+import pathlib as pl
 
 
 @dataclass(frozen=True)
-class Header:
+class Header(base.HeaderRow):
     dnsp_code: constr(max_length=10)
     retailer_code: constr(max_length=10)
     timestamp: str
@@ -38,7 +38,7 @@ class Header:
 
 
 @dataclass(frozen=True)
-class Detail:
+class Detail(base.NetworkRow):
     unique_number: constr(max_length=20)
 
     nmi: constr(max_length=10)
@@ -71,9 +71,9 @@ class Detail:
 
 
 @dataclass(frozen=True)
-class Footer:
-    record_count: condecimal(max_digits=10, decimal_places=0)
+class Footer(base.FooterRow):
     total_amount: condecimal(max_digits=15, decimal_places=2)
+    record_count: condecimal(max_digits=10, decimal_places=0)
 
     @staticmethod
     def record_type() -> int:
@@ -87,3 +87,40 @@ class Footer:
         )
 
 
+class Outstanding:
+    header: Header
+    footer: Footer
+    details: List[Detail] = list()
+
+    @staticmethod
+    def from_filesystem(path: pl.Path) -> "Outstanding":
+        with open(path, 'r') as f:
+            return Outstanding(csv.reader(f))
+
+    @staticmethod
+    def from_str(f: str) -> "Outstanding":
+        return Outstanding(csv.reader(io.StringIO(f)))
+
+    def __init__(self, csv_reader: Iterable[List[str]]) -> None:
+        rows = sum(1 for r in csv_reader)
+        for row in csv_reader:
+            record_type = int(row[0])
+            if record_type == Header.record_type():
+                self.header = Header.from_row(row)
+            elif record_type == Footer.record_type():
+                self.footer = Footer.from_row(row)
+            elif record_type == Detail.record_type():
+                self.details.append(Detail.from_row(row))
+            else: 
+                raise base.UnexpectedRecordType(
+                    "got {got} when parsing Outstanding file row {row}"
+                    .format(got=record_type, row=row))
+        if self.header is None:
+            raise base.MissingHeader()
+        if self.footer is None:
+            raise base.MissingFooter()
+        if self.footer.record_count + 2 != rows:
+            raise base.UnexpectedNumberOfRows(
+                    "got {got} but expected {exp}"
+                    .format(got=rows, exp=self.footer.record_count)
+                    )

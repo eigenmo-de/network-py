@@ -1,15 +1,19 @@
-from typing import List, Optional
+from typing import List, Optional, Iterable
 import dateutil.parser as du
 import datetime as dt
 
 from pydantic.dataclasses import dataclass
 from pydantic import constr, condecimal
 
-import networkbill.files as files
+import networkbilling.base as base
+
+import csv
+import io
+import pathlib as pl
 
 
 @dataclass(frozen=True)
-class Header:
+class Header(base.HeaderRow):
     dnsp_code: constr(max_length=10)
     retailer_code: constr(max_length=10)
     timestamp: str
@@ -30,7 +34,7 @@ class Header:
 
 
 @dataclass(frozen=True)
-class Footer:
+class Footer(base.FooterRow):
     charge_record_count: condecimal(max_digits=10, decimal_places=0)
     summary_record_count: condecimal(max_digits=10, decimal_places=0)
     total_tax_exclusive: condecimal(
@@ -46,6 +50,10 @@ class Footer:
         return 11
 
     @staticmethod
+    def total_record_count(self) -> int:
+        return int(self.charge_record_count) + int(self.summary_record_count)
+
+    @staticmethod
     def from_row(row: List[str]) -> "Footer":
         return Footer(
             charge_record_count=row[1],
@@ -57,7 +65,7 @@ class Footer:
 
 
 @dataclass(frozen=True)
-class Summary:
+class Summary(base.NetworkRow):
     unique_number: constr(max_length=20)
     nmi: constr(max_length=10)
     nmi_checksum: constr(min_length=1, max_length=1)
@@ -98,7 +106,7 @@ class Summary:
 
 
 @dataclass(frozen=True)
-class NuosCharge:
+class NuosCharge(base.NetworkRow):
     unique_number: constr(max_length=20)
     line_id: constr(max_length=17)
     old_unique_number: Optional[constr(max_length=20)]
@@ -153,7 +161,7 @@ class NuosCharge:
 
 
 @dataclass(frozen=True)
-class EventCharge:
+class EventCharge(base.NetworkRow):
     unique_number: constr(max_length=20)
     line_id: constr(max_length=17)
     old_unique_number: Optional[constr(max_length=20)]
@@ -206,7 +214,7 @@ class EventCharge:
 
 
 @dataclass(frozen=True)
-class InterestCharge:
+class InterestCharge(base.NetworkRow):
     unique_number: constr(max_length=20)
     line_id: constr(max_length=17)
     old_unique_number: Optional[constr(max_length=20)]
@@ -251,3 +259,53 @@ class InterestCharge:
             tax_charge_amount=row[15],
             tax_chage_indicator=row[16],
         )
+
+
+class Bill:
+    header: Header
+    footer: Footer
+    summaries: List[Summary] = list()
+    nuos: List[NuosCharge] = list()
+    event: List[EventCharge] = list()
+    interest: List[InterestCharge] = list()
+
+    @staticmethod
+    def from_filesystem(path: pl.Path) -> "Bill":
+        with open(path, 'r') as f:
+            return Bill(csv.reader(f))
+
+    @staticmethod
+    def from_str(f: str) -> "Bill":
+        return Bill(csv.reader(io.StringIO(f)))
+
+    def __init__(self, csv_reader: Iterable[List[str]]) -> None:
+        rows = sum(1 for r in csv_reader)
+        for row in csv_reader:
+            record_type = int(row[0])
+            if record_type == Header.record_type():
+                self.header = Header.from_row(row)
+            elif record_type == Footer.record_type():
+                self.footer = Footer.from_row(row)
+            elif record_type == Summary.record_type():
+                self.summaries.append(Summary.from_row(row))
+            elif record_type == NuosCharge.record_type():
+                self.nuos.append(NuosCharge.from_row(row))
+            elif record_type == EventCharge.record_type():
+                self.event.append(EventCharge.from_row(row))
+            elif record_type == InterestCharge.record_type():
+                self.interest.append(InterestCharge.from_row(row))
+            else:
+                raise base.UnexpectedRecordType(
+                    "got {got} when parsing bill file row {row}"
+                    .format(got=record_type, row=row))
+        if self.header is None:
+            raise base.MissingHeader()
+        if self.footer is None:
+            raise base.MissingFooter()
+        # have to include summary, charge, header and footer hance +2
+        rc = self.footer.summary_record_count + self.footer.charge_record_count + 2
+        if rc != rows:
+            raise base.UnexpectedNumberOfRows(
+                    "got {got} but expected {exp}"
+                    .format(got=rows, exp=rc)
+                    )

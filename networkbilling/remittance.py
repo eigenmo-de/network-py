@@ -9,11 +9,11 @@ import io
 import csv
 import pathlib as pl
 
-import networkbill.files as files
+import networkbilling.base as base
 
 
 @dataclass(frozen=True)
-class Header:
+class Header(base.HeaderRow):
     dnsp_code: constr(max_length=10)
     retailer_code: constr(max_length=10)
     timestamp: str
@@ -34,7 +34,7 @@ class Header:
 
 
 @dataclass(frozen=True)
-class Detail:
+class Detail(base.NetworkRow):
     unique_number: constr(max_length=20)
 
     nmi: constr(max_length=10)
@@ -61,7 +61,7 @@ class Detail:
 
 
 @dataclass(frozen=True)
-class Footer:
+class Footer(base.FooterRow):
     record_count: condecimal(max_digits=10, decimal_places=0)
 
     @staticmethod
@@ -75,10 +75,10 @@ class Footer:
         )
 
 
-@dataclass(frozen=True)
 class Remittance:
     header: Header
     footer: Footer
+    details: List[Detail] = list()
 
     @staticmethod
     def from_filesystem(path: pl.Path) -> "Remittance":
@@ -90,26 +90,25 @@ class Remittance:
         return Remittance(csv.reader(io.StringIO(f)))
 
     def __init__(self, csv_reader: Iterable[List[str]]) -> None:
-        self._files = dict()
-        rows = len(csv_reader)
+        rows = sum(1 for r in csv_reader)
         for row in csv_reader:
-            record_type = row[0]
+            record_type = int(row[0])
             if record_type == Header.record_type():
                 self.header = Header.from_row(row)
             elif record_type == Footer.record_type():
                 self.footer = Footer.from_row(row)
             elif record_type == Detail.record_type():
-                self.detail.append(Detail.from_row(row))
+                self.details.append(Detail.from_row(row))
             else: 
-                raise files.UnexpectedRecordType(
+                raise base.UnexpectedRecordType(
                     "got {got} when parsing remittance file row {row}"
                     .format(got=record_type, row=row))
         if self.header is None:
-            raise files.MissingHeader()
+            raise base.MissingHeader()
         if self.footer is None:
-            raise files.MissingFooter()
-        if self.footer.record_count != rows:
-            raise files.UnexpectedNumberOfRows(
+            raise base.MissingFooter()
+        if self.footer.record_count + 2 != rows:
+            raise base.UnexpectedNumberOfRows(
                     "got {got} but expected {exp}"
                     .format(got=rows, exp=self.footer.record_count)
                     )
