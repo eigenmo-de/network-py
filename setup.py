@@ -11,7 +11,7 @@ setuptools.setup(
     description="Parse and Verify Network Bill Files",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/esheppa/network-py",
+    url="https://github.com/eigenmo-de/network-py",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
