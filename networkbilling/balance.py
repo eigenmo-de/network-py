@@ -80,9 +80,6 @@ class Footer(base.FooterRow):
 
 
 class Balance:
-    header: Header
-    footer: Footer
-    details: List[Detail] = list()
 
     @staticmethod
     def from_filesystem(path: pl.Path) -> "Balance":
@@ -94,6 +91,7 @@ class Balance:
         return Balance(csv.reader(io.StringIO(f)))
 
     def __init__(self, csv_reader: Iterable[List[str]]) -> None:
+        self.details: List[Detail] = list()
         rows = sum(1 for r in csv_reader)
         for row in csv_reader:
             record_type = int(row[0])

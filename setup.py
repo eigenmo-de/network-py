@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="networkbilling-EIGENMODE",
-    version="0.0.3",
+    version="0.0.4",
     author="Eric Sheppard",
     author_email="eric@eigenmo.de",
     description="Parse and Verify Network Bill Files",

@@ -262,12 +262,6 @@ class InterestCharge(base.NetworkRow):
 
 
 class Bill:
-    header: Header
-    footer: Footer
-    summaries: List[Summary] = list()
-    nuos: List[NuosCharge] = list()
-    event: List[EventCharge] = list()
-    interest: List[InterestCharge] = list()
 
     @staticmethod
     def from_filesystem(path: pl.Path) -> "Bill":
@@ -279,6 +273,10 @@ class Bill:
         return Bill(csv.reader(io.StringIO(f)))
 
     def __init__(self, csv_reader: Iterable[List[str]]) -> None:
+        self.summaries: List[Summary] = list()
+        self.nuos: List[NuosCharge] = list()
+        self.event: List[EventCharge] = list()
+        self.interest: List[InterestCharge] = list()
         rows = sum(1 for r in csv_reader)
         for row in csv_reader:
             record_type = int(row[0])
