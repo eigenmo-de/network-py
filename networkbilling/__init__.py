@@ -1,43 +1,56 @@
+import networkbilling.vic as vic
+import networkbilling.nsw as nsw
+import networkbilling.qld as qld
+import networkbilling.sa as sa
+import networkbilling.base as base
 
-import networkbilling.bill as bill
-import networkbilling.dispute as dispute
-import networkbilling.disputestatuschange as disputestatuschange
-import networkbilling.outstanding as outstanding
-import networkbilling.balance as balance
-import networkbilling.remittance as remittance
-
-from typing import Any, Type
+from typing import Any, Callable
 
 
 # can throw ValueError due to date parsing
 
 import csv
 import io
-import pathlib as pl
+import pathlib
+from dataclasses import dataclass
 
 
-def from_filesystem(path: pl.Path) -> Type[object]:
+@dataclass(frozen=True)
+class State:
+
+    def __init__(self, name: str):
+        if name in ['nsw', 'qld', 'vic', 'sa']:
+            State(name=name)
+        else:
+            raise base.UnsupportedState
+
+    @property
+    def name(self) -> str:
+        return self.name
+
+    def get_header_mapping(self) -> Callable[[int], Any]:
+        if self.name == 'nsw':
+            return nsw.header_mapping
+        elif self.name == 'qld':
+            return qld.header_mapping
+        elif self.name == 'vic':
+            return vic.header_mapping
+        elif self.name == 'sa':
+            return sa.header_mapping
+        else:
+            raise base.UnsupportedState
+
+
+def from_filesystem(state: State, path: pathlib.Path) -> Any:
     with open(path, 'r') as f:
         reader = csv.reader(f)
         data = list(reader)
         header_record_type = int(data[0][0])
-        return header_mapping(header_record_type)(data)
+        return state.get_header_mapping()(header_record_type)(data)
 
 
-def from_str(f: str) -> Type[object]:
+def from_str(state: State, f: str) -> Any:
     reader = csv.reader(io.StringIO(f))
     data = list(reader)
     header_record_type = int(data[0][0])
-    return header_mapping(header_record_type)(data)
-
-
-def header_mapping(record_type: int) -> Any:
-    to_fn = {
-        10: bill.Bill,
-        800: remittance.Remittance,
-        910: dispute.Dispute,
-        913: disputestatuschange.DisputeStatusChange,
-        930: outstanding.Outstanding,
-        940: balance.Balance,
-    }
-    return to_fn[record_type]
+    return state.get_header_mapping()(header_record_type)(data)
