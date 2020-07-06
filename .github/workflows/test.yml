@@ -26,7 +26,7 @@ jobs:
         pip install flake8 pytest mypy
     - name: Lint with flake8
       run: flake8 networkbilling --max-line-length=127 --ignore=F401
-      #- name: Test with pytest
-      #run: pytest -v 
+    - name: Test with pytest
+      run: pytest -v 
     - name: Check with mypy
       run: mypy networkbilling --strict

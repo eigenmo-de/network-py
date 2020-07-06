@@ -11,6 +11,10 @@ def opt_decimal(s: str) -> Optional[decimal.Decimal]:
         return decimal.Decimal(s)
 
 
+class InvalidFilename(Exception):
+    pass
+
+
 class UnsupportedState(Exception):
     pass
 
