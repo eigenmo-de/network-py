@@ -38,7 +38,7 @@ class Detail(base.DetailRow):
     nmi_checksum: str
     payment_gst_inclusive: decimal.Decimal
     payment_date: Optional[datetime.date]
-    payment_referance: Optional[str]
+    payment_reference: Optional[str]
 
     @staticmethod
     def get_record_type() -> int:
@@ -53,7 +53,7 @@ class Detail(base.DetailRow):
             nmi_checksum=row[3],
             payment_gst_inclusive=decimal.Decimal(row[4]),
             payment_date=datetime.datetime.strptime(row[5], "%Y%m%d").date(),
-            payment_referance=row[6]
+            payment_reference=row[6]
         )
 
 

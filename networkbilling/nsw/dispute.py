@@ -36,7 +36,7 @@ class Detail(base.DetailRow):
     invoice_number: str
     line_identifier: str
     nmi: str
-    nmi_checkum: str
+    nmi_checksum: str
     disputed_amount_gst_exclusive: Optional[decimal.Decimal]
     gst_amount: Optional[decimal.Decimal]
     gst_indicator: Optional[str]
@@ -54,7 +54,7 @@ class Detail(base.DetailRow):
             invoice_number=row[1],
             line_identifier=row[2],
             nmi=row[3],
-            nmi_checkum=row[4],
+            nmi_checksum=row[4],
             disputed_amount_gst_exclusive=base.opt_decimal(row[5]),
             gst_amount=base.opt_decimal(row[6]),
             gst_indicator=row[7],

@@ -210,9 +210,9 @@ class Gsl(base.DetailRow):
 class ExcludedServiceCharge(base.DetailRow):
     record_type: str
     invoice_number: str
-    transaction_identifier: str
-    old_transaction: Optional[str]
-    old_invoice: Optional[str]
+    line_identifier: str
+    old_line_identifier: Optional[str]
+    old_invoice_number: Optional[str]
     transaction_date: datetime.date
     adjustment_indicator: str
     nmi: str
@@ -239,9 +239,9 @@ class ExcludedServiceCharge(base.DetailRow):
         return ExcludedServiceCharge(
             record_type=row[0],
             invoice_number=row[1],
-            transaction_identifier=row[2],
-            old_transaction=row[3],
-            old_invoice=row[4],
+            line_identifier=row[2],
+            old_line_identifier=row[3],
+            old_invoice_number=row[4],
             transaction_date=datetime.datetime.strptime(row[5], "%Y%m%d").date(),
             adjustment_indicator=row[6],
             nmi=row[7],

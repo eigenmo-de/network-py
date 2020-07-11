@@ -89,7 +89,7 @@ class Nuos(base.DetailRow):
     start_date: datetime.date
     end_date: datetime.date
     tariff_component: str
-    reding_type: str
+    reading_type: str
     description: str
     quantity: decimal.Decimal
     unit_measure: str
@@ -119,7 +119,7 @@ class Nuos(base.DetailRow):
             start_date=datetime.datetime.strptime(row[11], "%Y%m%d").date(),
             end_date=datetime.datetime.strptime(row[12], "%Y%m%d").date(),
             tariff_component=row[13],
-            reding_type=row[14],
+            reading_type=row[14],
             description=row[15],
             quantity=decimal.Decimal(row[16]),
             unit_measure=row[17],

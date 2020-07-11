@@ -81,7 +81,7 @@ class Detail(base.DetailRow):
     invoice_number: str
     transaction_type: str
     transaction_description: str
-    Transaction_count: decimal.Decimal
+    transaction_count: decimal.Decimal
     total_gst_exclusive: decimal.Decimal
     gst_amount: decimal.Decimal
     total_gst_inclusive: decimal.Decimal
@@ -97,7 +97,7 @@ class Detail(base.DetailRow):
             invoice_number=row[1],
             transaction_type=row[2],
             transaction_description=row[3],
-            Transaction_count=decimal.Decimal(row[4]),
+            transaction_count=decimal.Decimal(row[4]),
             total_gst_exclusive=decimal.Decimal(row[5]),
             gst_amount=decimal.Decimal(row[6]),
             total_gst_inclusive=decimal.Decimal(row[7])

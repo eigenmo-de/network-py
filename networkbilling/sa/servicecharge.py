@@ -41,7 +41,7 @@ class Detail(base.DetailRow):
     adjustment_indicator: Optional[str]
     nmi: str
     nmi_checksum: str
-    network_reference: Optional[str]
+    distributor_reference: Optional[str]
     retailer_reference: Optional[str]
     service_code: str
     line_description: str
@@ -70,7 +70,7 @@ class Detail(base.DetailRow):
             adjustment_indicator=row[6],
             nmi=row[7],
             nmi_checksum=row[8],
-            network_reference=row[9],
+            distributor_reference=row[9],
             retailer_reference=row[10],
             service_code=row[11],
             line_description=row[12],

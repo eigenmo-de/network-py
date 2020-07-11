@@ -10,10 +10,10 @@ import networkbilling.base as base
 
 
 @dataclass(frozen=True)
-class header(base.HeaderRow):
+class Header(base.HeaderRow):
     record_type: str
-    distributor: str
-    retailer: str
+    distributor_code: str
+    retailer_code: str
     timestamp: str
 
     @staticmethod
@@ -21,11 +21,11 @@ class header(base.HeaderRow):
         return 800
 
     @staticmethod
-    def from_row(row: List[str]) -> "header":
-        return header(
+    def from_row(row: List[str]) -> "Header":
+        return Header(
             record_type=row[0],
-            distributor=row[1],
-            retailer=row[2],
+            distributor_code=row[1],
+            retailer_code=row[2],
             timestamp=row[3]
         )
 
@@ -91,8 +91,8 @@ class Remittance:
         self.detail: List[Detail] = list()
         for row in csv_reader:
             record_type = int(row[0])
-            if record_type == header.get_record_type():
-                self.header = header.from_row(row)
+            if record_type == Header.get_record_type():
+                self.header = Header.from_row(row)
             elif record_type == Detail.get_record_type():
                 self.detail.append(Detail.from_row(row))
             elif record_type == Footer.get_record_type():

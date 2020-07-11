@@ -46,7 +46,7 @@ class Detail(base.DetailRow):
     service_code: str
     line_description: str
     service_date: Optional[datetime.date]
-    aftet_hours_indicator: Optional[str]
+    after_hours_indicator: Optional[str]
     completion_code: Optional[str]
     quantity: decimal.Decimal
     rate: decimal.Decimal
@@ -75,7 +75,7 @@ class Detail(base.DetailRow):
             service_code=row[11],
             line_description=row[12],
             service_date=datetime.datetime.strptime(row[13], "%Y%m%d").date(),
-            aftet_hours_indicator=row[14],
+            after_hours_indicator=row[14],
             completion_code=row[15],
             quantity=decimal.Decimal(row[16]),
             rate=decimal.Decimal(row[17]),

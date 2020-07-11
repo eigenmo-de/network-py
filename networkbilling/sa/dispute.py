@@ -33,7 +33,7 @@ class Header(base.HeaderRow):
 @dataclass(frozen=True)
 class Detail(base.DetailRow):
     record_type: str
-    invioce_number: str
+    invoice_number: str
     line_identifier: str
     nmi: str
     nmi_checksum: str
@@ -48,7 +48,7 @@ class Detail(base.DetailRow):
     def from_row(row: List[str]) -> "Detail":
         return Detail(
             record_type=row[0],
-            invioce_number=row[1],
+            invoice_number=row[1],
             line_identifier=row[2],
             nmi=row[3],
             nmi_checksum=row[4],

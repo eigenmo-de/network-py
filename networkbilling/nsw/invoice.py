@@ -193,7 +193,7 @@ class InterestCharge(base.DetailRow):
     adjustment_indicator: str
     adjustment_reason: Optional[str]
     nmi: str
-    nmi_checksun: str
+    nmi_checksum: str
     overdue_invoice_number: str
     original_due_date: datetime.date
     principal_amount: decimal.Decimal
@@ -218,7 +218,7 @@ class InterestCharge(base.DetailRow):
             adjustment_indicator=row[5],
             adjustment_reason=row[6],
             nmi=row[7],
-            nmi_checksun=row[8],
+            nmi_checksum=row[8],
             overdue_invoice_number=row[9],
             original_due_date=datetime.datetime.strptime(row[10], "%Y%m%d").date(),
             principal_amount=decimal.Decimal(row[11]),
