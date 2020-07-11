@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="networkbilling-EIGENMODE",
-    version="0.1.5",
+    version="0.1.6",
     author="Eric Sheppard",
     author_email="eric@eigenmo.de",
     description="Parse and Verify Network Bill Files",
@@ -18,9 +18,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=[
-        'python-dateutil',
-        'pydantic',
-    ],
+    install_requires=[],
     python_requires='>=3.8',
 )
