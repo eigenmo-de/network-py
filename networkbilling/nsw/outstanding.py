@@ -66,7 +66,7 @@ class Detail(base.DetailRow):
 
 
 @dataclass(frozen=True)
-class OutstandingInvoiceAdvice(base.FooterRow):
+class Footer(base.FooterRow):
     record_type: str
     outstanding_count: decimal.Decimal
     total_gst_inclusive: decimal.Decimal
@@ -76,8 +76,8 @@ class OutstandingInvoiceAdvice(base.FooterRow):
         return 932
 
     @staticmethod
-    def from_row(row: List[str]) -> "OutstandingInvoiceAdvice":
-        return OutstandingInvoiceAdvice(
+    def from_row(row: List[str]) -> "Footer":
+        return Footer(
             record_type=row[0],
             outstanding_count=decimal.Decimal(row[1]),
             total_gst_inclusive=decimal.Decimal(row[2])
@@ -103,8 +103,8 @@ class Outstanding:
                 self.header = Header.from_row(row)
             elif record_type == Detail.get_record_type():
                 self.detail.append(Detail.from_row(row))
-            elif record_type == OutstandingInvoiceAdvice.get_record_type():
-                self.footer = OutstandingInvoiceAdvice.from_row(row)
+            elif record_type == Footer.get_record_type():
+                self.footer = Footer.from_row(row)
             else:
                 raise base.UnexpectedRecordType(
                     "got {got} when parsing Outstanding file row {row}"
