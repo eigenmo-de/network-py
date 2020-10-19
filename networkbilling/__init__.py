@@ -23,7 +23,8 @@ class FileName:
 
     @staticmethod
     def parse(filename: str) -> 'FileName':
-        matches = re.match("NEM#NBCHARGES#([A-Z]+)#([A-Z]+)#([0-9]{14})V([0-9]+)", filename)
+        # some participants use `#` as the seperator while others use `_`. Allow for both here.
+        matches = re.match("NEM[_#]NBCHARGES[_#]([A-Z]+)[_#]([A-Z]+)[_#]([0-9]{14})V([0-9]+)", filename)
         distributor_mapping = {
             "ENERGEXP": "qld",
             "ERGONETP": "qld",
