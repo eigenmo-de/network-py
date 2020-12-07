@@ -24,7 +24,9 @@ class FileName:
     @staticmethod
     def parse(filename: str) -> 'FileName':
         # some participants use `#` as the seperator while others use `_`. Allow for both here.
-        matches = re.match("NEM[_#]NBCHARGES[_#]([A-Z]+)[_#]([A-Z]+)[_#]([0-9]{14})V([0-9]+)", filename)
+        # some participants use lowercase, `(?i)` makes the regex case insensitive
+        # some participants drop the `v[0-9]` on the end, make it optional as we don't use it anyway
+        matches = re.match("(?i)NEM[_#]NBCHARGES[_#]([A-Z]+)[_#]([A-Z]+)[_#]([0-9]{14})V?([0-9]+)?", filename)
         distributor_mapping = {
             "ENERGEXP": "qld",
             "ERGONETP": "qld",
