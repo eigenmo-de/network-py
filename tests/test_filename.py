@@ -27,3 +27,23 @@ def test_filename_three():
     assert parsed.timestamp == datetime.datetime(2020, 10, 22, 12, 12, 10)
     assert parsed.version == 1
     assert parsed.state == "vic"
+
+
+def test_filename_four():
+    name = "nem_nbcharges_solarisp_abcde_20201212222139v1.zip"
+    parsed = networkbilling.FileName.parse(name)
+    assert parsed.distributor == "SOLARISP"
+    assert parsed.retailer == "ABCDE"
+    assert parsed.timestamp == datetime.datetime(2020, 12, 12, 22, 21, 39)
+    assert parsed.version == 1
+    assert parsed.state == "vic"
+
+
+def test_filename_five():
+    name = "nem_nbcharges_solarisp_abcde_20201212201229v1.zip"
+    parsed = networkbilling.FileName.parse(name)
+    assert parsed.distributor == "SOLARISP"
+    assert parsed.retailer == "ABCDE"
+    assert parsed.timestamp == datetime.datetime(2020, 12, 12, 20, 12, 29)
+    assert parsed.version == 1
+    assert parsed.state == "vic"

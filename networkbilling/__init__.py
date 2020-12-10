@@ -41,13 +41,13 @@ class FileName:
             "UNITED": "vic",
             "EASTERN": "vic",
         }
-        if matches is not None and matches.group(1) in distributor_mapping.keys():
+        if matches is not None and matches.group(1).upper() in distributor_mapping.keys():
             return FileName(
-                distributor=matches.group(1),
-                retailer=matches.group(2),
+                distributor=matches.group(1).upper(),
+                retailer=matches.group(2).upper(),
                 timestamp=datetime.datetime.strptime(matches.group(3), "%Y%m%d%H%M%S"),
                 version=int(matches.group(4)),
-                state=distributor_mapping[matches.group(1)]
+                state=distributor_mapping[matches.group(1).upper()]
             )
         else:
             raise base.InvalidFilename("File name {} did not match the expected format".format(filename))
