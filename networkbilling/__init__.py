@@ -9,7 +9,7 @@ import io
 import pathlib
 import datetime
 import re
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 from dataclasses import dataclass
 
 
@@ -18,7 +18,7 @@ class FileName:
     distributor: str
     retailer: str
     timestamp: datetime.datetime
-    version: int
+    version: Optional[int]
     state: str
 
     @staticmethod
@@ -42,11 +42,16 @@ class FileName:
             "EASTERN": "vic",
         }
         if matches is not None and matches.group(1).upper() in distributor_mapping.keys():
+            
+            if matches.group(4) is not None:
+                version = int(matches.group(4))
+            else:
+                version = None
             return FileName(
                 distributor=matches.group(1).upper(),
                 retailer=matches.group(2).upper(),
                 timestamp=datetime.datetime.strptime(matches.group(3), "%Y%m%d%H%M%S"),
-                version=int(matches.group(4)),
+                version=version,
                 state=distributor_mapping[matches.group(1).upper()]
             )
         else:
