@@ -356,6 +356,7 @@ class Invoice:
         self.summary: List[Summary] = list()
         self.detail: List[Detail] = list()
         self.nuos: List[Nuos] = list()
+        self.gsl: List[Gsl] = list()
         self.excludedservicecharge: List[ExcludedServiceCharge] = list()
         self.interestcharge: List[InterestCharge] = list()
         for row in csv_reader:

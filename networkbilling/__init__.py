@@ -42,11 +42,10 @@ class FileName:
             "EASTERN": "vic",
         }
         if matches is not None and matches.group(1).upper() in distributor_mapping.keys():
-            
-            if matches.group(4) is not None:
-                version = int(matches.group(4))
-            else:
+            if matches.group(4) is None:
                 version = None
+            else:
+                version = int(matches.group(4))
             return FileName(
                 distributor=matches.group(1).upper(),
                 retailer=matches.group(2).upper(),
