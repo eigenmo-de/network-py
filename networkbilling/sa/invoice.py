@@ -160,6 +160,53 @@ class Nuos(base.DetailRow):
 
 
 @dataclass(frozen=True)
+class Gsl(base.DetailRow):
+    record_type: str
+    invoice_number: str
+    line_identifier: str
+    old_line_identifier: Optional[str]
+    old_invoice_number: Optional[str]
+    transaction_date: datetime.date
+    adjustment_indicator: str
+    nmi: str
+    nmi_checksum: str
+    distributor_reference: Optional[str]
+    retailer_reference: Optional[str]
+    gsl_code: str
+    line_description: str
+    gsl_event_date: datetime.date
+    charge_gst_exclusive: decimal.Decimal
+    gst_amount: Optional[decimal.Decimal]
+    gst_indicator: str
+
+    @staticmethod
+    def get_record_type() -> int:
+        return 400
+
+    @staticmethod
+    def from_row(row: List[str]) -> "Gsl":
+        return Gsl(
+            record_type=row[0],
+            invoice_number=row[1],
+            line_identifier=row[2],
+            old_line_identifier=row[3],
+            old_invoice_number=row[4],
+            transaction_date=datetime.datetime.strptime(row[5], "%Y%m%d").date(),
+            adjustment_indicator=row[6],
+            nmi=row[7],
+            nmi_checksum=row[8],
+            distributor_reference=row[9],
+            retailer_reference=row[10],
+            gsl_code=row[11],
+            line_description=row[12],
+            gsl_event_date=datetime.datetime.strptime(row[13], "%Y%m%d").date(),
+            charge_gst_exclusive=decimal.Decimal(row[14]),
+            gst_amount=base.opt_decimal(row[15]),
+            gst_indicator=row[16]
+        )
+
+
+@dataclass(frozen=True)
 class ExcludedServiceCharge(base.DetailRow):
     record_type: str
     invoice_number: str
@@ -321,6 +368,8 @@ class Invoice:
                 self.detail.append(Detail.from_row(row))
             elif record_type == Nuos.get_record_type():
                 self.nuos.append(Nuos.from_row(row))
+            elif record_type == Gsl.get_record_type():
+                self.gsl.append(Gsl.from_row(row))
             elif record_type == ExcludedServiceCharge.get_record_type():
                 self.excludedservicecharge.append(ExcludedServiceCharge.from_row(row))
             elif record_type == InterestCharge.get_record_type():
